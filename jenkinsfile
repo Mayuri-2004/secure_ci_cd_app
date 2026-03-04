@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    stages {
+
+        stage('Build') {
+            steps {
+                echo "Building application..."
+            }
+        }
+
+        stage('Unit Test') {
+            steps {
+                echo "Running tests..."
+            }
+        }
+
+        stage('Deploy to Dev') {
+            steps {
+                echo "Deploying to Dev..."
+            }
+        }
+
+        stage('Deploy to Staging') {
+            steps {
+                echo "Deploying to Staging..."
+            }
+        }
+
+        stage('Approval') {
+            steps {
+                input message: "Approve deployment to Production?", ok: "Approve"
+            }
+        }
+        stage('Deploy to Production') {
+            steps {
+                sshagent(['prod-server-key']) {
+                    sh '''
+                    ssh -o StrictHostKeyChecking=no ubuntu@51.20.136.236 "
+                    cd /var/www/secure_ci_cd_app &&
+                    git pull origin master
+                   
+                    "
+                    '''
+                }
+            }
+        }
+
+    }
+       }
+    
+
